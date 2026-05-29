@@ -1,0 +1,26 @@
+#scapy must be installed in the terminal before use "pip install scapy". scapy is a library that works with packets on the network
+#version 1
+from scapy.all import *
+
+#please ignore the problems, those will be solved once running the script, because the IP and TCP aren't defined, and they will be after the script starts sniffing.
+
+greet = input(f"type START to start scanning your local network (CTRL+C to end the scanner): ") #get the answer from the user
+
+def packetAnalysis(packet): #packet is a variable being created, and it holds all of the information about the packets being sniffed
+    if IP in packet: #if there is an ip able to be found in this packet....
+        sourceIP = packet[IP].src #from the packet, grab the source IP, and put it into that variable
+        destIP = packet[IP].dst #from the packet, grab the destination IP, and put it into that variable
+        protocol = packet[IP].proto #from the packet, grab the protocol, and put it into that variable
+        if TCP in packet: #if theres TCP at all in this packet... (mainly used to find the destination port)
+            destPort = packet[TCP].dport #then grab the port destination, and put it into that variable
+            print (f"Source IP:{sourceIP}, Destination IP: {destIP}, Protocol: {protocol}, Destination Port: {destPort}") #if everything works as intended, print the final result
+        else: #but if there isnt a TCP (port destination) in this packet...
+            print (f"Source IP:{sourceIP}, Destination IP: {destIP}, Protocol: {protocol}, Destination Port: NOTFOUND") #instead of breaking completely, print this instead
+    else: #if there isnt an ip able to be found in this packet...
+        print("IP not found.")
+
+
+if greet.upper() == "START": #if the user tells the program to start...
+    sniff(prn=packetAnalysis, store=0)  #then start sniffing the local IPs on the router. basically, every time a packet is found, start the function on line 7. also, dont store any packets, as this will take up memory
+else: #if the user types anything else....
+    print("Analyzer shut off.")

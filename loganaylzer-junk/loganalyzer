@@ -1,0 +1,17 @@
+#version 1
+
+failedAttempts = {} #this is a DICTIONARY, and failed attempts will be apended to here
+
+with open("sample.log", "r") as file: #file = open("sample.log", "r"), meaning the "file" variable is the "sample.log", on read permissions only.
+    for line in file: #for every line in the file, loop this block...
+        if "Failed password" in line: #if "Failed password" is in the line...
+            parts = line.split() #split the entire line into individual words, seperated by spaces
+            addressPart = parts[10] #the 10th word split is the ip, which is what we need to see to see which ip produced each failed attempt
+            if addressPart in failedAttempts: #if the ip is already in failedAttempts....
+                failedAttempts[addressPart] = failedAttempts[addressPart] + 1 #then add it to the dictionary, and add 1 to its flags
+            else: #if not...
+                failedAttempts[addressPart] = 1 #add it to the dictionary, and set the flags to 1
+
+for ip, count in failedAttempts.items(): # in failedAttempts.items(), ip would be the ip, and count would be how many flags it has. "ip" and "count" are variables set by me, and the items are set up like [iphere, number] so the script knows what to assign each variable to
+    if count >= 3: #if the count is over 3...
+        print(f"{ip} has been flagged for failing password attempts three or more times. It has failed {count} times.")

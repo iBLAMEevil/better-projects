@@ -1,0 +1,48 @@
+#VERSION 1
+#this script uses the AbuseIPDB, used for reporting common malicious ip addresses.
+#also, requests needs to be installed beforehand (pip install requests).
+ 
+
+import requests 
+
+ipAddr = input("Please input the ip address to check: ")
+apiKey = "XXXXX" #this is where youre supposed to input your own api
+
+
+def checker(ipAddr, apiKey):
+    headers = { #these headers essentially act as the what you want (accept), as well as your verification (apikey).
+        "Key": apiKey,
+        "Accept": "application/json"
+    }
+    params = { #the parameters are essentially the goods of what you requested.
+        "ipAddress": ipAddr,
+        "maxAgeInDays": 90
+    }
+
+    response = requests.get("https://api.abuseipdb.com/api/v2/check", headers=headers, params=params) #the format for requests is request.get(link, headers = x, params =  y)
+
+    data = response.json()["data"] #this is the entirety of the data, specifically honed in at the "data" segment. its like opening a directory in linux, and data would be the directory youre in with this string of code
+
+    checkedIp = data["ipAddress"] #these are all different "subdirectories" or categories of the line above. all of these different arguments can be found in the documentation for abuseIPDB
+    abuseScore = data["abuseConfidenceScore"]
+    country = data["countryCode"]
+    isp = data["isp"]
+    lastReport = data["lastReportedAt"]
+    totalReports = data["totalReports"]
+
+    print(f"Ip address: {checkedIp}") #then, print the rest
+    print(f"Abuse likelihood: {abuseScore}")
+    print(f"Location: {country}")
+    print(f"ISP: {isp}")
+    print(f"Last reported at {lastReport}")
+    print(f"Total number of reports: {totalReports}")
+
+    if abuseScore == 0: #if the abuse score is 0...
+        print("Clean, no threats detected")
+    elif abuseScore >= 1 and abuseScore <= 50: #if the abuse score is less than 50 and above 1...
+        print("Suspicious, monitor this IP")
+    elif abuseScore > 50: #if the abuse score is greater than 50..
+        print("Dangerous, highly likely malicious")
+
+
+checker(ipAddr, apiKey) #call the function

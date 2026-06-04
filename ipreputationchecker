@@ -6,7 +6,7 @@
 import requests 
 
 ipAddr = input("Please input the ip address to check: ")
-apiKey = "XXXXX" #this is where youre supposed to input your own api
+apiKey = "xxxx" #this is where youre supposed to input your own api
 
 
 def checker(ipAddr, apiKey):

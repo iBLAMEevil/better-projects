@@ -1,4 +1,10 @@
 import flask
 from flask import Flask
 
-app = Flask(__name__)
+app = Flask(__name__) #Flask is a tool used for building websites and applications
+
+@app.route("/") #the decorator "assigns" the function to the app, defined in the previous line. This is basically saying "when users visit website, do this"
+def index(): #function defining
+    return "SIEM Dashboard" 
+
+app.run(debug=True) #once the script is ran, run the website, with debug on. link to the website will be in the console

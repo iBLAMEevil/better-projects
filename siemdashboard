@@ -1,9 +1,8 @@
-import flask
-from flask import Flask
+from flask import Flask, render_template
 
 app = Flask(__name__) #Flask is a tool used for building websites and applications
 
-@app.route("/") #the decorator "assigns" the function to the app, defined in the previous line. This is basically saying "when users visit website, do this"
+@app.route("/") #the decorator "assigns" the function to the app, defined in the previous line. This is basically saying "when users visit website through the root path,  do this"
 def index(): #function defining
     return "SIEM Dashboard" 
 

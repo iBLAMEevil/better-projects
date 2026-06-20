@@ -1,0 +1,42 @@
+<html>
+  <head>
+    <title>Port Scanner</title>
+  </head>
+  <body>
+  <p> <a href="/">Back to homepage</a> </p>
+  <h1>Port Scanner</h1>
+  <form action="/portscan" method="POST">
+  <p> Fair warning, the larger the space between the bounds is, the longer it will take.</p>
+  <p> Every port scanned is an extra second, so 9000 ports scanned will take about 9000 seconds, or 2 hours and 30 minutes.</p>
+  <p> PORT SCANNING WITHOUT AUTHORIZATION IS PROBABLY NOT LEGAL. CONTINUE AT YOUR OWN RISK.</p>
+  <input type="text" name="ipAddress2" placeholder="Enter IP address to scan">
+  <br>
+  <input type="text" name="startPort" placeholder="Enter starting bounds">
+  <br>
+  <input type="text" name="endPort" placeholder="Enter ending bounds">
+  <br>
+  <p> Would you like to display closed ports as well?</p>
+  <input type="radio" name="showClosed" value="yes"> Yes
+  <input type="radio" name="showClosed" value="no"> No
+  <br>
+  <button type="submit">Check IP ports</button> 
+  </form>
+  {% if scanResults %}
+    {% for item in scanResults %}
+      {% if item.openPort %}
+        {% if item.service %}
+          <p>Port {{item.openPort}} ({{item.service}}), open </p>
+        {% else %}
+          <p>Port {{item.openPort}}, open</p>
+        {% endif %} 
+      {% else %}
+        {% if item.service %}
+          <p>Port {{item.closedPort}} ({{item.service}}), closed </p>
+        {% else %}
+          <p>Port {{item.closedPort}}, closed</p>
+        {% endif %} 
+      {% endif %}  
+    {% endfor %}
+  {% endif %}
+  </body>
+</html>

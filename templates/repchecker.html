@@ -10,9 +10,9 @@
     <button type="submit">Check IP</button> <!--once the data is input, press the submit button, then end the form.-->
     </form>
   {% if results %} <!--this is how the results are formatted. "if results exist..."-->
-    {% if results.error %} 
+    {% if results.error %} <!--if there is no valid API key assigned....-->
       <p> API key failure, double check the API key, and make sure it's up to date.</p>
-    {% else %} 
+    {% else %} <!--otherwise....-->
       <p>Abuse Score: {{ results.abuseScore }}</p>
       <p>Location: {{ results.country }}</p>
       <p>ISP: {{ results.isp }}</p>
@@ -23,3 +23,4 @@
   {% endif %} <!--then, end the if.-->
   </body>
 </html>
+

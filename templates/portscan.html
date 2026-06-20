@@ -5,11 +5,11 @@
   <body>
   <p> <a href="/">Back to homepage</a> </p>
   <h1>Port Scanner</h1>
-  <form action="/portscan" method="POST">
-  <p> Fair warning, the larger the space between the bounds is, the longer it will take.</p>
+  <form action="/portscan" method="POST"> <!--when you send information to this website, it is a POST request-->
+  <p> Fair warning, the larger the space between the bounds is, the longer it will take.</p> 
   <p> Every port scanned is an extra second, so 9000 ports scanned will take about 9000 seconds, or 2 hours and 30 minutes.</p>
-  <p> PORT SCANNING WITHOUT AUTHORIZATION IS PROBABLY NOT LEGAL. CONTINUE AT YOUR OWN RISK.</p>
-  <input type="text" name="ipAddress2" placeholder="Enter IP address to scan">
+  <p> PORT SCANNING WITHOUT AUTHORIZATION IS PROBABLY NOT LEGAL. CONTINUE AT YOUR OWN RISK.</p><!--READ THIS READ THIS READ THIS-->
+  <input type="text" name="ipAddress2" placeholder="Enter IP address to scan"> <!--notice these inputs, these are the same as python, except in html format. the type of input it is = text, the name is the variable assigned to, and the placeholder is what shows up in the entry box-->
   <br>
   <input type="text" name="startPort" placeholder="Enter starting bounds">
   <br>
@@ -19,18 +19,18 @@
   <input type="radio" name="showClosed" value="yes"> Yes
   <input type="radio" name="showClosed" value="no"> No
   <br>
-  <button type="submit">Check IP ports</button> 
+  <button type="submit">Check IP ports</button> <!--then, send it off to the server to return results-->
   </form>
-  {% if scanResults %}
-    {% for item in scanResults %}
-      {% if item.openPort %}
-        {% if item.service %}
+  {% if scanResults %} <!--if there is scan results...-->
+    {% for item in scanResults %} <!-- for every entry in those results-->
+      {% if item.openPort %} <!--if its an open port...-->
+        {% if item.service %} <!-- if it has a service tag...-->
           <p>Port {{item.openPort}} ({{item.service}}), open </p>
         {% else %}
           <p>Port {{item.openPort}}, open</p>
-        {% endif %} 
-      {% else %}
-        {% if item.service %}
+        {% endif %} <!--endif is important because, unlike python, you cannot just end the if by backspacing-->
+      {% else %} <!--if the ports closed...-->
+        {% if item.service %} <!--if it has a service tag...-->
           <p>Port {{item.closedPort}} ({{item.service}}), closed </p>
         {% else %}
           <p>Port {{item.closedPort}}, closed</p>

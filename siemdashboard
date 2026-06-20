@@ -128,35 +128,37 @@ def scanPort(ipAddr2, scanStart, scanEnd, answer): #if you want to see more inde
 
 app = Flask(__name__) #this defines flask, and once "app.run" is called, then flask initiates, but first it needs to be assigned to a variable.
 
+#get and post are two different requests for flask websites. when you visit a website, you send a get request, then once that happens, you can choose to run a code with it by assigning a function to it
+#post is also a request for flask websites. when you pass over information to the website, you send a post request. by default, post requests are turned off, which is why "methods = [GET,POST]" is necessary
 
-@app.route("/", methods=["GET"])
+@app.route("/", methods=["GET"]) #when someone visits this page...
 def index():
-    website = render_template("homepage.html", title="Welcome")
-    return website
+    website = render_template("homepage.html", title="Welcome") #render template is how sites format themselves. it's a shortcut string, and its used to assign an html file to a site, and then run it using render_template.
+    return website #then, give back the website after it is defined.
 
-@app.route("/iprep", methods=["GET", "POST"]) 
+@app.route("/iprep", methods=["GET", "POST"])  #when someone visits, or sends info to the page...
 def repCheck():
-    if request.method == "GET":
-        website = render_template("repchecker.html", title="IPrepChecker") 
+    if request.method == "GET": #if someone visits this website...
+        website = render_template("repchecker.html", title="IPrepChecker")
         return website
-    if request.method == "POST":
-        ipAddr = request.form.get("ipAddress") 
-        results = checker(ipAddr, ipRepKey)
-        website = render_template("repchecker.html", title="IPrepChecker", results=results)
-        return website
+    if request.method == "POST": #if someone sends information to this website...
+        ipAddr = request.form.get("ipAddress")  #when you send information to a website, it is found in request.forms for flask. in this file, you grab, or "get" that information from the assigned variable in the html file. In this case, the ipaddress was assigned to "ipAddress"
+        results = checker(ipAddr, ipRepKey) #run the function, and assign it to a variable
+        website = render_template("repchecker.html", title="IPrepChecker", results=results) #remake the website, but with the results
+        return website #show the website to the user
 
-@app.route("/portscan", methods=["GET", "POST"])
+@app.route("/portscan", methods=["GET", "POST"]) #when someone visits, or sends info to the page...
 def scanny():
-     if request.method == "GET":
+     if request.method == "GET": #when someone visits, or sends info to the page...
           website = render_template("portscan.html", title = "Port Scanner")
           return website
-     if request.method == "POST":
-        ipAddr2 = request.form.get("ipAddress2")
-        scanStart = int(request.form.get("startPort"))
+     if request.method == "POST": #when someone visits, or sends info to the page...
+        ipAddr2 = request.form.get("ipAddress2") #same as previous explanation
+        scanStart = int(request.form.get("startPort")) #these numbers must be in integer value for the script to function correctly
         scanEnd = int(request.form.get("endPort"))
         answer = request.form.get("showClosed")
-        scanResults = scanPort(ipAddr2, scanStart, scanEnd, answer)
-        website = render_template("portscan.html", title="Port Scanner", scanResults=scanResults)
-        return website
+        scanResults = scanPort(ipAddr2, scanStart, scanEnd, answer) #run the script, assign it to a variable
+        website = render_template("portscan.html", title="Port Scanner", scanResults=scanResults) #remake the website with the results
+        return website #show the website.
 
 app.run(debug=True) #run the website, with debug on.

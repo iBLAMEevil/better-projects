@@ -1,6 +1,30 @@
 #flask must be installed in the terminal before usage (pip install flask)
 from flask import Flask, render_template, request #flask is a tool used by developers to put their works into a website, as this code does.
-import requests, socket
+import requests, socket, sqlite3
+from datetime import datetime
+
+def databaseInitiate(): #this is where making a database comes in. 
+    database = sqlite3.connect("repchecker.db") #first, connect to the database on the computer
+    database.execute("""
+                    CREATE TABLE IF NOT EXISTS repchecker (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    ip_address TEXT,
+                    abuse_score INTEGER,
+                    threat TEXT,
+                    date_checked TEXT)
+                    """) #this is a standard format for inserting data into the database. it will make this table if it doesn't exist with those headers.
+    database.execute("""
+                     CREATE TABLE IF NOT EXISTS portscanHistory (
+                     id INTEGER PRIMARY KEY AUTOINCREMENT,
+                     ip_address TEXT,
+                     start_port INTEGER,
+                     end_port INTEGER,
+                     open_ports TEXT,
+                     date_checked TEXT)
+                     """)
+    database.commit() #then, save all changes to the database
+    database.close() #then, close
+
 
 
 #ip reputation checker stuff
@@ -144,8 +168,17 @@ def repCheck():
     if request.method == "POST": #if someone sends information to this website...
         ipAddr = request.form.get("ipAddress")  #when you send information to a website, it is found in request.forms for flask. in this file, you grab, or "get" that information from the assigned variable in the html file. In this case, the ipaddress was assigned to "ipAddress"
         results = checker(ipAddr, ipRepKey) #run the function, and assign it to a variable
+        database = sqlite3.connect("repchecker.db") #connect to the database because we need to post history from the function used.
+        if "error" in results:
+            pass
+        else:
+            database.execute((""" INSERT INTO repchecker (ip_address, abuse_score, threat, date_checked)
+                VALUES (?, ?, ?, ?)"""), (results["checkedIP"], results["abuseScore"], results["overall"], datetime.now().strftime("%Y-%m-%d %H:%M:%S"))) #then execute the data into the database. this is the standard format for sqlite, so its worth reading into proper commands for sqlite.
+            database.commit() #furthermore, that datetime format is because, when python plans to update, regular datetime.now() will not work, so i have to format it.
+        database.close() #then, close the connection to the database
         website = render_template("repchecker.html", title="IPrepChecker", results=results) #remake the website, but with the results
         return website #show the website to the user
+        
 
 @app.route("/portscan", methods=["GET", "POST"]) #when someone visits, or sends info to the page...
 def scanny():
@@ -153,12 +186,23 @@ def scanny():
           website = render_template("portscan.html", title = "Port Scanner")
           return website
      if request.method == "POST": #when someone visits, or sends info to the page...
+        databaseOpenPorts = [] #since i only wanted to post the open ports to the database, i would have to throw only the open ports into a list, and then join only the open ports together for the database entry.
         ipAddr2 = request.form.get("ipAddress2") #same as previous explanation
         scanStart = int(request.form.get("startPort")) #these numbers must be in integer value for the script to function correctly
         scanEnd = int(request.form.get("endPort"))
         answer = request.form.get("showClosed")
+        database = sqlite3.connect("repchecker.db") #start the connection to teh database
         scanResults = scanPort(ipAddr2, scanStart, scanEnd, answer) #run the script, assign it to a variable
+        for i in scanResults: #for every entry in the scan results...
+            if "openPort" in i: #if theres an openPort found in the dictionary...
+               databaseOpenPorts.append(str((i["openPort"]))) #this must be converted into a string because sqlite expects text, not integer.
+        joined = ",".join(databaseOpenPorts) #then, join all of the total openports into one nice format for the database.
+        database.execute((""" INSERT INTO portscanHistory  (ip_address, start_port, end_port, open_ports, date_checked)
+                          VALUES (?, ?, ?, ?, ?)"""), (ipAddr2, scanStart, scanEnd , joined, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))) #same as previous explanation found in repchecker()
+        database.commit() #save the changes
+        database.close() #close the connection
         website = render_template("portscan.html", title="Port Scanner", scanResults=scanResults) #remake the website with the results
         return website #show the website.
 
-app.run(debug=True) #run the website, with debug on.
+databaseInitiate()
+app.run(debug=True) #run the website, with debug on. 
